@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, Paper, Typography } from '@mui/material';
+import { Alert, Box, Button, CircularProgress, Paper, Typography } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import MultipleSelectField from '../components/MultipleSelectField';
 import {
@@ -78,9 +78,8 @@ const StockPrices = () => {
     };
   }, [dateRangeParams, selectedTickers]);
 
-  const { data, isLoading, hasError, refetch } = useGetStockPrices(getSockPricesParams);
-
-  const hasData = data && Object.values(data).some((prices) => prices.length > 0);
+  const { data, isLoading, hasError, refetch, error, clearError } =
+    useGetStockPrices(getSockPricesParams);
 
   const tickersOptions = tickers.map((ticker) => ({
     label: `${ticker} (${tickerToName[ticker]})`,
@@ -96,9 +95,16 @@ const StockPrices = () => {
   return (
     <Box px={[2, 2, 4, 6]} py={2}>
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Typography variant="h4" textAlign="center" my={4}>
-          Stock Prices
-        </Typography>
+        <Box display="flex" alignItems="center" gap={4}>
+          <Typography variant="h4" textAlign="center" my={4} whiteSpace="nowrap">
+            Stock Prices
+          </Typography>
+          {error && (
+            <Alert onClose={clearError} severity="error" variant="outlined" sx={{ width: '100%' }}>
+              {error}
+            </Alert>
+          )}
+        </Box>
         <LayoutToggle
           layout={layout}
           setLayout={setLayout}
@@ -121,12 +127,12 @@ const StockPrices = () => {
       >
         <Paper elevation={3}>
           <Box height={500} p={1} pt={3}>
-            {((!hasData && !hasError) || (hasError && isLoading)) && (
+            {isLoading && (
               <Box display="flex" justifyContent="center" height="500px" mt="200px">
                 <CircularProgress />
               </Box>
             )}
-            {hasData && !hasError && (
+            {!hasError && !isLoading && (
               <StockPricesChart
                 key={layout}
                 data={data}
@@ -136,7 +142,7 @@ const StockPrices = () => {
               />
             )}
             {hasError && !isLoading && (
-              <Box display="flex" justifyContent="center" mt="170px">
+              <Box display="flex" justifyContent="center" mt="200px">
                 <Button variant="outlined" onClick={() => refetch()}>
                   Refetch data
                 </Button>

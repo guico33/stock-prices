@@ -4,6 +4,8 @@ import { StockPriceDataPoint, Timespan } from '../types/polygon';
 import { StockPrice, Ticker } from '../types/stocks';
 import { maxDate, minDate } from '../constants/stocks';
 import { formatDateApi } from '../utils/dates';
+import { getErrorMessage } from '../utils/api';
+import { useEffect, useState } from 'react';
 
 type GetSingleStockPricesParams = {
   ticker: Ticker;
@@ -102,9 +104,36 @@ export const useGetStockPrices = ({
     data = dataMaxRange;
   }
 
+  const queryError = queries.find((query) => query.error)?.error;
+  const errorMessage = queryError ? getErrorMessage(queryError) : null;
+
+  const [error, setError] = useState<string | null>(null);
+  const [lastErrorTime, setLastErrorTime] = useState(0);
+
+  useEffect(() => {
+    const now = Date.now();
+    if (queryError && now - lastErrorTime >= 3000) {
+      setError(errorMessage);
+      setLastErrorTime(now);
+    } else if (!queryError) {
+      setError(null);
+    }
+  }, [queryError, errorMessage, lastErrorTime]);
+
+  const clearError = () => {
+    setError(null);
+  };
+
+  const refetch = () => {
+    clearError();
+    queries.forEach((query) => {
+      query.refetch();
+    });
+  };
+
   const isLoading = queries.some((query) => query.status === 'pending');
 
   const hasError = queries.some((query) => query.status === 'error');
 
-  return { data, isLoading, hasError, refetch: queryClient.refetchQueries.bind(queryClient) };
+  return { data, isLoading, hasError, refetch, error, clearError };
 };

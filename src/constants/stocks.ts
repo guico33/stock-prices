@@ -11,10 +11,10 @@ export const tickerToName: Record<Ticker, string> = {
 };
 
 export const tickerToColor: Record<Ticker, string> = {
-  AAPL: '#8884d8',
-  AMZN: '#82ca9d',
-  MSFT: '#ffc658',
-  META: '#ff7300',
+  AAPL: '#A3AAAE',
+  AMZN: '#FF9900',
+  MSFT: '#00A4EF',
+  META: '#1877F2',
 };
 
 export const pricesTypes: OHLC[] = ['open', 'high', 'low', 'close'] as const;
