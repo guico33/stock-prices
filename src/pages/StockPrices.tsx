@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import DateRangeSlider from '../components/DateRangeSlider';
-import LayoutToggle from '../components/LayoutToggle.t';
+import LayoutToggle from '../components/LayoutToggle';
 import MultipleSelectField from '../components/MultipleSelectField';
 import RadioButtonGroup from '../components/RadioButtonGroup';
 import StockPricesChart from '../components/StockPricesChart';
