@@ -1,6 +1,7 @@
 import type { RenderOptions } from '@testing-library/react';
 import { render } from '@testing-library/react';
 import React, { PropsWithChildren } from 'react';
+
 import Providers from '../Providers';
 
 export function renderWithProviders(ui: React.ReactElement, renderOptions: RenderOptions) {

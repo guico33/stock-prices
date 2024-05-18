@@ -1,8 +1,9 @@
-import * as React from 'react';
 import HorizontalSplitIcon from '@mui/icons-material/HorizontalSplit';
 import SpaceDashboardIcon from '@mui/icons-material/SpaceDashboard';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup, { ToggleButtonGroupProps } from '@mui/material/ToggleButtonGroup';
+import * as React from 'react';
+
 import { Layout } from '../types/ui';
 
 type LayoutToggleProps = {

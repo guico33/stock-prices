@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+
 import { OHLC, Ticker } from '../types/stocks';
 
 export const tickers: Ticker[] = ['AAPL', 'AMZN', 'MSFT', 'META'] as const;

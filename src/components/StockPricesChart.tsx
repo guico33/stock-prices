@@ -1,12 +1,13 @@
+import { Box, Paper, Typography } from '@mui/material';
 import { ResponsiveLine } from '@nivo/line';
 import dayjs from 'dayjs';
 import { useCallback, useMemo } from 'react';
+
+import { tickerToColor } from '../constants/stocks';
 import { DateRange } from '../types/dates';
 import { OHLC, StockPrice, Ticker } from '../types/stocks';
-import { formatDateReadable, getDiffDays } from '../utils/dates';
-import { Box, Paper, Typography } from '@mui/material';
-import { tickerToColor } from '../constants/stocks';
 import { transformData } from '../utils/charts';
+import { formatDateReadable, getDiffDays } from '../utils/dates';
 
 type StockPricesChartProps = {
   dateRange: DateRange;

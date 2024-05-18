@@ -12,12 +12,18 @@ module.exports = {
   ],
   ignorePatterns: ['dist', '.eslintrc.cjs'],
   parser: '@typescript-eslint/parser',
-  plugins: ['react-refresh'],
+  parserOptions: {
+    "sourceType": "module",
+    "ecmaVersion": "latest"
+  },
+  plugins: ['react-refresh', 'simple-import-sort'],
   rules: {
     'react/jsx-curly-brace-presence': ['error', { props: 'never', children: 'ignore' }],
     'react-refresh/only-export-components': [
       'warn',
       { allowConstantExport: true },
     ],
+    "simple-import-sort/imports": "warn",
+    "simple-import-sort/exports": "warn",
   },
 }

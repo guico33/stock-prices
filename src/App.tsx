@@ -1,9 +1,9 @@
-import dayjs from 'dayjs';
-import Providers from './Providers';
-import StockPrices from './pages/StockPrices';
-
-import isBetween from 'dayjs/plugin/isBetween';
 import { GlobalStyles } from '@mui/material';
+import dayjs from 'dayjs';
+import isBetween from 'dayjs/plugin/isBetween';
+
+import StockPrices from './pages/StockPrices';
+import Providers from './Providers';
 
 dayjs.extend(isBetween);
 

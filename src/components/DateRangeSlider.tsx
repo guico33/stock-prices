@@ -1,10 +1,11 @@
 import Box, { BoxProps } from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
+import dayjs from 'dayjs';
+import { useMemo } from 'react';
+
+import { maxDate, minDate } from '../constants/stocks';
 import { DateRange } from '../types/dates';
 import { formatDateReadable, getDiffDays } from '../utils/dates';
-import dayjs from 'dayjs';
-import { maxDate, minDate } from '../constants/stocks';
-import { useMemo } from 'react';
 
 type DateRangeSliderProps = {
   value: DateRange;

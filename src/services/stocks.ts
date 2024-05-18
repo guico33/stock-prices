@@ -1,11 +1,12 @@
 import { useQueries, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
+
 import PolygonAPI from '../api/polygon';
+import { maxDate, minDate } from '../constants/stocks';
 import { StockPriceDataPoint, Timespan } from '../types/polygon';
 import { StockPrice, Ticker } from '../types/stocks';
-import { maxDate, minDate } from '../constants/stocks';
-import { formatDateApi } from '../utils/dates';
 import { getErrorMessage } from '../utils/api';
-import { useEffect, useState } from 'react';
+import { formatDateApi } from '../utils/dates';
 
 type GetSingleStockPricesParams = {
   ticker: Ticker;

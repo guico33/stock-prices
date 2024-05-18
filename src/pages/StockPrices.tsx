@@ -1,25 +1,26 @@
 import { Alert, Box, Button, CircularProgress, Paper, Typography } from '@mui/material';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
+
+import DateRangeSlider from '../components/DateRangeSlider';
+import LayoutToggle from '../components/LayoutToggle.t';
 import MultipleSelectField from '../components/MultipleSelectField';
+import RadioButtonGroup from '../components/RadioButtonGroup';
+import StockPricesChart from '../components/StockPricesChart';
 import {
   maxDate,
   minDate,
   ohlcToLabel,
   pricesTypes,
+  tickers,
   tickerToColor,
   tickerToName,
-  tickers,
 } from '../constants/stocks';
 import { GetMultipleStockPricesParams, useGetStockPrices } from '../services/stocks';
-import { OHLC, Ticker } from '../types/stocks';
-import StockPricesChart from '../components/StockPricesChart';
-import DateRangeSlider from '../components/DateRangeSlider';
-import { useEffect, useMemo, useState } from 'react';
 import { DateRange } from '../types/dates';
-import { getDiffDays } from '../utils/dates';
-import RadioButtonGroup from '../components/RadioButtonGroup';
-import LayoutToggle from '../components/LayoutToggle.t';
+import { OHLC, Ticker } from '../types/stocks';
 import { Layout } from '../types/ui';
+import { getDiffDays } from '../utils/dates';
 
 type FormValues = {
   selectedTickers: Ticker[];

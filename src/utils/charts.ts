@@ -1,7 +1,8 @@
 import dayjs from 'dayjs';
+
+import { DateRange } from '../types/dates';
 import { OHLC, StockPrice, Ticker } from '../types/stocks';
 import { formatDateReadable } from './dates';
-import { DateRange } from '../types/dates';
 
 export const transformData = (
   data: Record<Ticker, StockPrice[]>,
