@@ -1,10 +1,10 @@
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 
-interface Option {
+type Option = {
   label: string;
   value: string | number;
-}
+};
 
 type SelectFieldProps<FormValues extends FieldValues> = {
   control: Control<FormValues>;
