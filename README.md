@@ -24,7 +24,7 @@ npm install -g pnpm
 
 ## Usage
 
-To run the development server, use the following command:
+To start the development server, use the following command:
 
 ```shell
 pnpm dev
