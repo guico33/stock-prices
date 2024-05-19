@@ -1,11 +1,17 @@
 import '@testing-library/jest-dom';
 
-beforeEach(() => {
-  Storage.prototype.getItem = jest.fn(() => JSON.stringify({}));
-  Storage.prototype.setItem = jest.fn();
-  Storage.prototype.removeItem = jest.fn();
-  Storage.prototype.clear = jest.fn();
-});
+import dayjs from 'dayjs';
+import isBetween from 'dayjs/plugin/isBetween';
+
+dayjs.extend(isBetween);
+
+jest.mock('@nivo/line', () => ({
+  ResponsiveLine: () => 'MockedChart',
+}));
+
+jest.mock('./src/constants/environment.ts', () => ({
+  POLYGON_API_KEY: 'mock-api-key',
+}));
 
 afterEach(() => {
   jest.clearAllTimers();

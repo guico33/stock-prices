@@ -6,6 +6,7 @@ import { maxDate, minDate } from '../constants/stocks';
 import { StockPriceDataPoint, Timespan } from '../types/polygon';
 import { StockPrice, Ticker } from '../types/stocks';
 import { getErrorMessage } from '../utils/api';
+import { dataPointToStockPrice } from '../utils/data';
 import { formatDateApi } from '../utils/dates';
 
 type GetSingleStockPricesParams = {
@@ -17,7 +18,7 @@ type GetSingleStockPricesParams = {
   nextUrl?: string;
 };
 
-type GetSingleStockPricesResponse = {
+export type GetSingleStockPricesResponse = {
   results: StockPriceDataPoint[];
 };
 
@@ -28,14 +29,6 @@ export type GetMultipleStockPricesParams = {
   timespan: Timespan;
   multiplier: number;
 };
-
-const transformDataPoint = (dataPoint: StockPriceDataPoint): StockPrice => ({
-  date: new Date(dataPoint.t),
-  open: dataPoint.o,
-  close: dataPoint.c,
-  high: dataPoint.h,
-  low: dataPoint.l,
-});
 
 export const getStockPrices = async ({
   ticker,
@@ -48,7 +41,7 @@ export const getStockPrices = async ({
     `/aggs/ticker/${ticker}/range/${multiplier}/${timespan}/${startDate}/${endDate}?adjusted=true&sort=asc`,
   );
 
-  const data = response.data.results.map(transformDataPoint);
+  const data = response.data.results.map(dataPointToStockPrice);
 
   return data;
 };
@@ -94,8 +87,9 @@ export const useGetStockPrices = ({
   }, {} as Record<Ticker, StockPrice[]>);
 
   let data = queries.reduce((acc, query, index) => {
-    if (query.status === 'success') {
-      acc[tickers[index]] = query.data;
+    const ticker = tickers[index];
+    if (query.status === 'success' && ticker !== undefined) {
+      acc[ticker] = query.data;
     }
     return acc;
   }, {} as Record<Ticker, StockPrice[]>);

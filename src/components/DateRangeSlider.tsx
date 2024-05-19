@@ -1,5 +1,3 @@
-import { useCallback } from 'react';
-
 import Box, { BoxProps } from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
 import dayjs from 'dayjs';
@@ -50,9 +48,7 @@ const DateRangeSlider = ({
 
   const step = useMemo(() => {
     const diffDays = getDiffDays(dateRangeSliderMinDate, dateRangeSliderMaxDate);
-    if (diffDays < 7) {
-      return (24 * 60 * 60 * 1000) / 2; // half a day
-    } else if (diffDays < 30) {
+    if (diffDays < 30) {
       return 24 * 60 * 60 * 1000 * 1; // 1 day
     } else if (diffDays < 365) {
       return 24 * 60 * 60 * 1000 * 5; // 5 days
@@ -77,42 +73,31 @@ const DateRangeSlider = ({
 
   const isNewValueValid = (newValue: number | number[]) => {
     if (Array.isArray(newValue)) {
-      const [newMin, newMax] = newValue as number[];
-      // prevent the range from being less than 2 days
-      if (newMax - newMin < 2 * 24 * 60 * 60 * 1000) {
+      const [newMin, newMax] = newValue as [number, number];
+      // prevent the range from being shorter than 2 days
+      if (getDiffDays(newMin, newMax) < 2) {
         return false;
       }
     }
     return true;
   };
 
-  const handleChange = useCallback(
-    (_: Event, newValue: number | number[]) => {
-      if (!isNewValueValid(newValue)) return;
-      setLocalValue(
-        (Array.isArray(newValue)
-          ? (newValue as number[]).map((v) => new Date(v))
-          : []) as DateRange,
-      );
-    },
-    [isNewValueValid, setLocalValue],
-  );
+  const handleChange = (newValue: number | number[]) => {
+    if (!isNewValueValid(newValue)) return;
+    setLocalValue(
+      (Array.isArray(newValue) ? (newValue as number[]).map((v) => new Date(v)) : []) as DateRange,
+    );
+  };
 
-  const handleChangeCommitted = useCallback(
-    (_: unknown, newValue: number | number[]) => {
-      if (!isNewValueValid(newValue)) return;
+  const handleChangeCommitted = (newValue: number | number[]) => {
+    if (isNewValueValid(newValue)) {
       onChange(
         (Array.isArray(newValue)
           ? (newValue as number[]).map((v) => new Date(v))
           : []) as DateRange,
       );
-    },
-    [isNewValueValid, onChange],
-  );
-
-  const getAriaLabel = useCallback(() => 'Date range', []);
-
-  const convertedValue = useMemo(() => localValue.map((v: Date) => v.valueOf()), []);
+    }
+  };
 
   return (
     <Box {...boxProps}>
@@ -127,14 +112,14 @@ const DateRangeSlider = ({
             },
           },
         }}
-        getAriaLabel={getAriaLabel}
-        value={convertedValue}
+        getAriaLabel={() => 'Date range'}
+        value={localValue.map((v: Date) => v.valueOf())}
         min={minTime}
         max={maxTime}
         step={step}
         disabled={disabled}
-        onChange={handleChange}
-        onChangeCommitted={handleChangeCommitted}
+        onChange={(_, newValue) => handleChange(newValue)}
+        onChangeCommitted={(_, newValue) => handleChangeCommitted(newValue)}
         valueLabelDisplay="auto"
         getAriaValueText={formatDateReadable}
         valueLabelFormat={formatDateReadable}

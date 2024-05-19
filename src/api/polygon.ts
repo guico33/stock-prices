@@ -1,13 +1,15 @@
 // api/polygon.js
 import axios from 'axios';
 
+import { POLYGON_API_KEY } from '../constants/environment';
+
 const PolygonAPI = axios.create({
   baseURL: 'https://api.polygon.io/v2',
 });
 
 PolygonAPI.interceptors.request.use((config) => {
   config.params = config.params || {};
-  config.params['apiKey'] = import.meta.env.VITE_POLYGON_API_KEY;
+  config.params['apiKey'] = POLYGON_API_KEY;
   return config;
 });
 

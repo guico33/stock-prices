@@ -20,13 +20,13 @@ const LayoutToggle = ({ layout, setLayout, ...buttonGroupProps }: LayoutTogglePr
       value={layout}
       exclusive
       onChange={handleChangeLayout}
-      aria-label="text alignment"
+      aria-label="layout toggle"
       {...buttonGroupProps}
     >
-      <ToggleButton value="compact" aria-label="compact layout">
+      <ToggleButton value="compact" aria-label="compact layout" disabled={layout === 'compact'}>
         <HorizontalSplitIcon />
       </ToggleButton>
-      <ToggleButton value="full" aria-label="full layout">
+      <ToggleButton value="full" aria-label="full layout" disabled={layout === 'full'}>
         <SpaceDashboardIcon />
       </ToggleButton>
     </ToggleButtonGroup>

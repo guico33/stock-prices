@@ -25,24 +25,26 @@ const MenuProps = {
   },
 };
 
-type MultipleSelectFieldProps<FormValues extends FieldValues> = {
+type MultiSelectFieldProps<FormValues extends FieldValues> = {
   control: Control<FormValues>;
   name: Path<FormValues>;
   label: string;
   options: Option[];
   defaultValue?: PathValue<FormValues, Path<FormValues>>;
   disabled?: boolean;
+  maxSelected?: number;
 } & BoxProps;
 
-const MultipleSelectField = <FormValues extends FieldValues = FieldValues>({
+const MultiSelectField = <FormValues extends FieldValues = FieldValues>({
   control,
   name,
   label,
   options,
   defaultValue,
   disabled,
+  maxSelected,
   ...boxProps
-}: MultipleSelectFieldProps<FormValues>) => {
+}: MultiSelectFieldProps<FormValues>) => {
   const theme = useTheme();
 
   const colorsMap = options.reduce((acc, option) => {
@@ -72,7 +74,10 @@ const MultipleSelectField = <FormValues extends FieldValues = FieldValues>({
               }}
               input={<OutlinedInput id={`${name}-chip`} label={label} />}
               renderValue={(selected) => (
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                <Box
+                  sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}
+                  data-testid="selected-options"
+                >
                   {(selected as string[]).map((value) => (
                     <Chip
                       key={value}
@@ -91,7 +96,11 @@ const MultipleSelectField = <FormValues extends FieldValues = FieldValues>({
                 <MenuItem
                   key={option.value}
                   value={option.value}
-                  disabled={field.value.length >= 3 && !field.value.includes(option.value)}
+                  disabled={
+                    maxSelected !== undefined &&
+                    field.value.length >= maxSelected &&
+                    !field.value.includes(option.value)
+                  }
                   style={{
                     fontWeight:
                       field.value.indexOf(option.value) === -1
@@ -110,4 +119,4 @@ const MultipleSelectField = <FormValues extends FieldValues = FieldValues>({
   );
 };
 
-export default MultipleSelectField;
+export default MultiSelectField;

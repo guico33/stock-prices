@@ -1,4 +1,5 @@
 import { GlobalStyles } from '@mui/material';
+import { QueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 
@@ -7,9 +8,11 @@ import Providers from './Providers';
 
 dayjs.extend(isBetween);
 
+const queryClient = new QueryClient();
+
 function App() {
   return (
-    <Providers>
+    <Providers queryClient={queryClient}>
       <GlobalStyles
         styles={(theme) => ({
           body: { backgroundColor: theme.palette.grey[100] },

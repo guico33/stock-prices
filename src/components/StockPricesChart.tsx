@@ -6,12 +6,11 @@ import { useCallback, useMemo } from 'react';
 import { tickerToColor } from '../constants/stocks';
 import { DateRange } from '../types/dates';
 import { OHLC, StockPrice, Ticker } from '../types/stocks';
-import { transformData } from '../utils/charts';
+import { toNivoLineData } from '../utils/charts';
 import { formatDateReadable, getDiffDays } from '../utils/dates';
 
 type StockPricesChartProps = {
   dateRange: DateRange;
-  tickers: Ticker[];
   ohlc: OHLC;
   data: Record<Ticker, StockPrice[]>;
 };
@@ -25,7 +24,7 @@ const StockPricesChart = ({
   dateRange: [startDate, endDate],
 }: StockPricesChartProps) => {
   const transformedData = useMemo(
-    () => transformData(data, ohlc, [startDate, endDate]),
+    () => toNivoLineData(data, ohlc, [startDate, endDate]),
     [data, endDate, startDate, ohlc],
   );
 

@@ -4,9 +4,10 @@ import { useForm } from 'react-hook-form';
 
 import DateRangeSlider from '../components/DateRangeSlider';
 import LayoutToggle from '../components/LayoutToggle';
-import MultipleSelectField from '../components/MultipleSelectField';
+import MultiSelectField from '../components/MultiSelectField';
 import RadioButtonGroup from '../components/RadioButtonGroup';
 import StockPricesChart from '../components/StockPricesChart';
+import { MAX_SELECTED_TICKERS } from '../constants/config';
 import {
   maxDate,
   minDate,
@@ -134,13 +135,7 @@ const StockPrices = () => {
               </Box>
             )}
             {!hasError && !isLoading && (
-              <StockPricesChart
-                key={layout}
-                data={data}
-                tickers={tickers}
-                ohlc={ohlc}
-                dateRange={dateRangeParams}
-              />
+              <StockPricesChart key={layout} data={data} ohlc={ohlc} dateRange={dateRangeParams} />
             )}
             {hasError && !isLoading && (
               <Box display="flex" justifyContent="center" mt="200px">
@@ -160,11 +155,12 @@ const StockPrices = () => {
         >
           <Box p={2} display="flex" gap={2} flexWrap="wrap">
             <Box display="flex" flexDirection="column" gap={4}>
-              <MultipleSelectField
+              <MultiSelectField
                 control={control}
                 name="selectedTickers"
                 label="Tickers"
                 options={tickersOptions}
+                maxSelected={MAX_SELECTED_TICKERS}
               />
 
               <RadioButtonGroup control={control} name="ohlc" label="OHLC" options={ohlcOptions} />
@@ -178,7 +174,7 @@ const StockPrices = () => {
                 justifyContent="space-between"
               >
                 <Box>
-                  <Typography variant="h6">Date Range </Typography>
+                  <Typography variant="h6">Date Range</Typography>
                 </Box>
                 <Button variant="outlined" onClick={() => setDateRange([minDate, maxDate])}>
                   Reset
