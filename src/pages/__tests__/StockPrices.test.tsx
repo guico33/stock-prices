@@ -4,7 +4,15 @@ import { when } from 'jest-when';
 import { act } from 'react';
 
 import * as StockPricesChart from '../../components/StockPricesChart';
-import { maxDate, minDate, ohlcToLabel, tickers, tickerToName } from '../../constants/stocks';
+import {
+  DEFAULT_OHLC,
+  DEFAULT_TICKER,
+  MAX_DATE,
+  MAX_DAY_SHOW_HOURS,
+  MAX_DAYS_FETCH_GRANULAR_DATA,
+  MIN_DATE,
+} from '../../constants/config';
+import { ohlcToLabel, tickers, tickerToName } from '../../constants/stocks';
 import * as stocksService from '../../services/stocks';
 import { OHLC, StockPrice, Ticker } from '../../types/stocks';
 import * as ChartUtils from '../../utils/charts';
@@ -31,8 +39,8 @@ describe('StockPrices', () => {
     MSFT: generateMaxRangePolygonResponse().results.map(dataPointToStockPrice),
   };
 
-  const defaultTicker: Ticker = 'AAPL';
-  const defaultOhlc: OHLC = 'close';
+  const defaultTicker: Ticker = DEFAULT_TICKER;
+  const defaultOhlc: OHLC = DEFAULT_OHLC;
 
   beforeAll(() => {
     jest.useFakeTimers();
@@ -43,8 +51,8 @@ describe('StockPrices', () => {
     tickers.forEach((ticker) => {
       when(getStockPricesSpy)
         .calledWith({
-          startDate: formatDateApi(minDate),
-          endDate: formatDateApi(maxDate),
+          startDate: formatDateApi(MIN_DATE),
+          endDate: formatDateApi(MAX_DATE),
           multiplier: 1,
           ticker,
           timespan: 'day',
@@ -65,8 +73,8 @@ describe('StockPrices', () => {
     });
 
     expect(getStockPricesSpy).toHaveBeenCalledWith({
-      startDate: formatDateApi(minDate),
-      endDate: formatDateApi(maxDate),
+      startDate: formatDateApi(MIN_DATE),
+      endDate: formatDateApi(MAX_DATE),
       multiplier: 1,
       ticker: defaultTicker,
       timespan: 'day',
@@ -77,7 +85,7 @@ describe('StockPrices', () => {
     await waitFor(() => {
       expect(stockPricesChartSpy).toHaveBeenCalledWith(
         {
-          dateRange: [minDate, maxDate],
+          dateRange: [MIN_DATE, MAX_DATE],
           data: {
             [defaultTicker]: maxRangeStockPrices[defaultTicker],
           },
@@ -100,8 +108,8 @@ describe('StockPrices', () => {
 
       await waitFor(() => {
         expect(getStockPricesSpy).toHaveBeenCalledWith({
-          startDate: formatDateApi(minDate),
-          endDate: formatDateApi(maxDate),
+          startDate: formatDateApi(MIN_DATE),
+          endDate: formatDateApi(MAX_DATE),
           multiplier: 1,
           ticker: defaultTicker,
           timespan: 'day',
@@ -112,7 +120,9 @@ describe('StockPrices', () => {
 
       expect(dateRangeInputs).toHaveLength(2);
 
-      const newDateTime = dayjs(minDate).add(30, 'day').valueOf();
+      const newDateTime = dayjs(MIN_DATE)
+        .add(MAX_DAYS_FETCH_GRANULAR_DATA - 5, 'day')
+        .valueOf();
 
       const endDateInput = dateRangeInputs[1];
 
@@ -128,7 +138,7 @@ describe('StockPrices', () => {
 
       await waitFor(() => {
         expect(getStockPricesSpy).toHaveBeenCalledWith({
-          startDate: formatDateApi(minDate),
+          startDate: formatDateApi(MIN_DATE),
           endDate: formatDateApi(newDateTime),
           multiplier: 1,
           ticker: defaultTicker,
@@ -139,15 +149,15 @@ describe('StockPrices', () => {
       expect(getStockPricesSpy).toHaveBeenCalledTimes(2);
     });
 
-    it('should not fetch new prices if the timeframe is more than 90 days', async () => {
+    it(`should not fetch new prices if the timeframe is more than ${MAX_DAYS_FETCH_GRANULAR_DATA} days`, async () => {
       renderWithProviders(<StockPrices />);
 
       expect(screen.getByText('Stock Prices')).toBeInTheDocument();
 
       await waitFor(() => {
         expect(getStockPricesSpy).toHaveBeenCalledWith({
-          startDate: formatDateApi(minDate),
-          endDate: formatDateApi(maxDate),
+          startDate: formatDateApi(MIN_DATE),
+          endDate: formatDateApi(MAX_DATE),
           multiplier: 1,
           ticker: defaultTicker,
           timespan: 'day',
@@ -158,7 +168,9 @@ describe('StockPrices', () => {
 
       expect(dateRangeInputs).toHaveLength(2);
 
-      const newDateTime = dayjs(minDate).add(100, 'day').valueOf();
+      const newDateTime = dayjs(MIN_DATE)
+        .add(MAX_DAYS_FETCH_GRANULAR_DATA + 10, 'day')
+        .valueOf();
 
       const endDateInput = dateRangeInputs[1];
 
@@ -176,6 +188,52 @@ describe('StockPrices', () => {
         expect(getStockPricesSpy).toHaveBeenCalledTimes(1);
       });
     });
+
+    it(`should fetch prices with an hourly timespan if the date range is less than ${MAX_DAY_SHOW_HOURS} days`, async () => {
+      renderWithProviders(<StockPrices />);
+
+      expect(screen.getByText('Stock Prices')).toBeInTheDocument();
+
+      await waitFor(() => {
+        expect(getStockPricesSpy).toHaveBeenCalledWith({
+          startDate: formatDateApi(MIN_DATE),
+          endDate: formatDateApi(MAX_DATE),
+          multiplier: 1,
+          ticker: defaultTicker,
+          timespan: 'day',
+        });
+      });
+
+      const dateRangeInputs: HTMLInputElement[] = screen.getAllByLabelText('Date range');
+
+      expect(dateRangeInputs).toHaveLength(2);
+
+      const newDateTime = dayjs(MIN_DATE)
+        .add(MAX_DAY_SHOW_HOURS - 1, 'day')
+        .valueOf();
+
+      const endDateInput = dateRangeInputs[1];
+
+      if (!endDateInput) throw new Error('End date input not found');
+
+      fireEvent.change(endDateInput, {
+        target: { value: newDateTime },
+      });
+
+      act(() => {
+        jest.runAllTimers();
+      });
+
+      await waitFor(() => {
+        expect(getStockPricesSpy).toHaveBeenCalledWith({
+          startDate: formatDateApi(MIN_DATE),
+          endDate: formatDateApi(newDateTime),
+          multiplier: 1,
+          ticker: defaultTicker,
+          timespan: 'hour',
+        });
+      });
+    });
   });
 
   describe('ticker selection', () => {
@@ -188,8 +246,8 @@ describe('StockPrices', () => {
 
       await waitFor(() => {
         expect(getStockPricesSpy).toHaveBeenCalledWith({
-          startDate: formatDateApi(minDate),
-          endDate: formatDateApi(maxDate),
+          startDate: formatDateApi(MIN_DATE),
+          endDate: formatDateApi(MAX_DATE),
           multiplier: 1,
           ticker: defaultTicker,
           timespan: 'day',
@@ -209,8 +267,8 @@ describe('StockPrices', () => {
 
       await waitFor(() => {
         expect(getStockPricesSpy).toHaveBeenCalledWith({
-          startDate: formatDateApi(minDate),
-          endDate: formatDateApi(maxDate),
+          startDate: formatDateApi(MIN_DATE),
+          endDate: formatDateApi(MAX_DATE),
           multiplier: 1,
           ticker: newTickers[0],
           timespan: 'day',
@@ -218,8 +276,8 @@ describe('StockPrices', () => {
       });
 
       expect(getStockPricesSpy).toHaveBeenCalledWith({
-        startDate: formatDateApi(minDate),
-        endDate: formatDateApi(maxDate),
+        startDate: formatDateApi(MIN_DATE),
+        endDate: formatDateApi(MAX_DATE),
         multiplier: 1,
         ticker: newTickers[1],
         timespan: 'day',
@@ -237,8 +295,8 @@ describe('StockPrices', () => {
 
       await waitFor(() => {
         expect(getStockPricesSpy).toHaveBeenCalledWith({
-          startDate: formatDateApi(minDate),
-          endDate: formatDateApi(maxDate),
+          startDate: formatDateApi(MIN_DATE),
+          endDate: formatDateApi(MAX_DATE),
           multiplier: 1,
           ticker: defaultTicker,
           timespan: 'day',
@@ -280,7 +338,7 @@ describe('StockPrices', () => {
             [defaultTicker]: maxRangeStockPrices[defaultTicker],
           },
           defaultOhlc,
-          [minDate, maxDate],
+          [MIN_DATE, MAX_DATE],
         );
       });
 
@@ -298,7 +356,7 @@ describe('StockPrices', () => {
             [defaultTicker]: maxRangeStockPrices[defaultTicker],
           },
           newOhlc,
-          [minDate, maxDate],
+          [MIN_DATE, MAX_DATE],
         );
       });
     });

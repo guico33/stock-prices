@@ -2,7 +2,7 @@ import { useQueries, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 
 import PolygonAPI from '../api/polygon';
-import { maxDate, minDate } from '../constants/stocks';
+import { MAX_DATE, MIN_DATE } from '../constants/config';
 import { StockPriceDataPoint, Timespan } from '../types/polygon';
 import { StockPrice, Ticker } from '../types/stocks';
 import { getErrorMessage } from '../utils/api';
@@ -37,6 +37,7 @@ export const getStockPrices = async ({
   timespan,
   multiplier,
 }: GetSingleStockPricesParams): Promise<StockPrice[]> => {
+  // assume a single page of data
   const response = await PolygonAPI.get<GetSingleStockPricesResponse>(
     `/aggs/ticker/${ticker}/range/${multiplier}/${timespan}/${startDate}/${endDate}?adjusted=true&sort=asc`,
   );
@@ -79,8 +80,8 @@ export const useGetStockPrices = ({
     const dataMaxRange = queryClient.getQueryData<StockPrice[]>([
       'stockPrices',
       ticker,
-      formatDateApi(minDate),
-      formatDateApi(maxDate),
+      formatDateApi(MIN_DATE),
+      formatDateApi(MAX_DATE),
     ]);
     acc[ticker] = dataMaxRange ?? [];
     return acc;

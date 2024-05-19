@@ -74,10 +74,7 @@ const MultiSelectField = <FormValues extends FieldValues = FieldValues>({
               }}
               input={<OutlinedInput id={`${name}-chip`} label={label} />}
               renderValue={(selected) => (
-                <Box
-                  sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}
-                  data-testid="selected-options"
-                >
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                   {(selected as string[]).map((value) => (
                     <Chip
                       key={value}

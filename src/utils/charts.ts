@@ -2,7 +2,6 @@ import dayjs, { OpUnitType } from 'dayjs';
 
 import { DateRange } from '../types/dates';
 import { OHLC, StockPrice, Ticker } from '../types/stocks';
-import { formatDateReadable } from './dates';
 
 export const toNivoLineData = (
   data: Record<Ticker, StockPrice[]>,
@@ -18,7 +17,7 @@ export const toNivoLineData = (
       // https://github.com/plouc/nivo/issues/1006
       id: `${ticker}-${startDate}-${endDate}`,
       data: filteredPrices.map((price) => ({
-        x: formatDateReadable(price.date),
+        x: price.date,
         y: price[ohlc],
       })),
     };

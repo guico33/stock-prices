@@ -3,7 +3,7 @@ import Slider from '@mui/material/Slider';
 import dayjs from 'dayjs';
 import { useEffect, useMemo, useState } from 'react';
 
-import { maxDate, minDate } from '../constants/stocks';
+import { MAX_DATE, MIN_DATE } from '../constants/config';
 import { DateRange } from '../types/dates';
 import { formatDateReadable, getDiffDays } from '../utils/dates';
 
@@ -28,18 +28,18 @@ const DateRangeSlider = ({
   }, [value]);
 
   const dateRangeSliderMinDate = useMemo(() => {
-    if (dayjs(dateRangeParams[0]).isAfter(minDate)) {
+    if (dayjs(dateRangeParams[0]).isAfter(MIN_DATE)) {
       return dateRangeParams[0];
     } else {
-      return minDate;
+      return MIN_DATE;
     }
   }, [dateRangeParams]);
 
   const dateRangeSliderMaxDate = useMemo(() => {
-    if (dayjs(dateRangeParams[1]).isBefore(maxDate)) {
+    if (dayjs(dateRangeParams[1]).isBefore(MAX_DATE)) {
       return dateRangeParams[1];
     } else {
-      return maxDate;
+      return MAX_DATE;
     }
   }, [dateRangeParams]);
 
@@ -48,12 +48,13 @@ const DateRangeSlider = ({
 
   const step = useMemo(() => {
     const diffDays = getDiffDays(dateRangeSliderMinDate, dateRangeSliderMaxDate);
+    const unixDay = 24 * 60 * 60 * 1000;
     if (diffDays < 30) {
-      return 24 * 60 * 60 * 1000 * 1; // 1 day
+      return unixDay;
     } else if (diffDays < 365) {
-      return 24 * 60 * 60 * 1000 * 5; // 5 days
+      return unixDay * 5;
     } else {
-      return 24 * 60 * 60 * 1000 * 30; // one month
+      return unixDay * 30;
     }
   }, [dateRangeSliderMinDate, dateRangeSliderMaxDate]);
 
@@ -74,7 +75,7 @@ const DateRangeSlider = ({
   const isNewValueValid = (newValue: number | number[]) => {
     if (Array.isArray(newValue)) {
       const [newMin, newMax] = newValue as [number, number];
-      // prevent the range from being shorter than 2 days
+      // prevent the user from selecting a range shorter than 2 days
       if (getDiffDays(newMin, newMax) < 2) {
         return false;
       }
@@ -110,6 +111,9 @@ const DateRangeSlider = ({
             '&[data-index="1"]': {
               paddingRight: 6,
             },
+          },
+          '.MuiSlider-track': {
+            height: '3px',
           },
         }}
         getAriaLabel={() => 'Date range'}

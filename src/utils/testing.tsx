@@ -18,7 +18,6 @@ export function renderWithProviders(ui: React.ReactElement, renderOptions: Rende
     <Providers queryClient={queryClient}>{children}</Providers>
   );
 
-  // Return an object with the store and all of RTL's query functions
   return render(ui, { wrapper: Wrapper, ...renderOptions });
 }
 

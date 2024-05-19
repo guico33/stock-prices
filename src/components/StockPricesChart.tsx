@@ -3,6 +3,7 @@ import { ResponsiveLine } from '@nivo/line';
 import dayjs from 'dayjs';
 import { useCallback, useMemo } from 'react';
 
+import { MAX_DAY_SHOW_HOURS } from '../constants/config';
 import { tickerToColor } from '../constants/stocks';
 import { DateRange } from '../types/dates';
 import { OHLC, StockPrice, Ticker } from '../types/stocks';
@@ -30,15 +31,15 @@ const StockPricesChart = ({
 
   const nbDays = useMemo(() => getDiffDays(startDate, endDate), [startDate, endDate]);
 
-  const precision: 'minute' | 'day' | 'hour' | 'month' | 'year' = useMemo(() => {
-    if (nbDays <= 2) return 'hour';
+  const precision: 'day' | 'hour' = useMemo(() => {
+    if (nbDays <= MAX_DAY_SHOW_HOURS) return 'hour';
     return 'day';
   }, [nbDays]);
 
   const tickValues = useMemo(() => {
     switch (precision) {
       case 'hour': {
-        return 'every 2 hours';
+        return 'every 4 hours';
       }
       default: {
         const interval = Math.round(nbDays / 10);
@@ -46,6 +47,8 @@ const StockPricesChart = ({
       }
     }
   }, [nbDays, precision]);
+
+  const xFormat = precision === 'hour' ? '%d/%m/%Y %H:%M' : '%d/%m/%Y';
 
   const tickFormatter = useCallback(
     (value: string) => {
@@ -72,11 +75,11 @@ const StockPricesChart = ({
       margin={{ top: 20, right: 40, bottom: 60, left: 40 }}
       xScale={{
         type: 'time',
-        format: '%d/%m/%Y',
+        format: xFormat,
         useUTC: false,
         precision,
       }}
-      xFormat="time:%d/%m/%Y"
+      xFormat={`time:${xFormat}`}
       yScale={{ type: 'linear' }}
       axisBottom={{
         format: tickFormatter,

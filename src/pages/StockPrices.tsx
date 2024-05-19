@@ -7,10 +7,16 @@ import LayoutToggle from '../components/LayoutToggle';
 import MultiSelectField from '../components/MultiSelectField';
 import RadioButtonGroup from '../components/RadioButtonGroup';
 import StockPricesChart from '../components/StockPricesChart';
-import { MAX_SELECTED_TICKERS } from '../constants/config';
 import {
-  maxDate,
-  minDate,
+  DEFAULT_OHLC,
+  DEFAULT_TICKER,
+  MAX_DATE,
+  MAX_DAY_SHOW_HOURS,
+  MAX_DAYS_FETCH_GRANULAR_DATA,
+  MAX_SELECTED_TICKERS,
+  MIN_DATE,
+} from '../constants/config';
+import {
   ohlcToLabel,
   pricesTypes,
   tickers,
@@ -29,11 +35,11 @@ type FormValues = {
 };
 
 const StockPrices = () => {
-  const [dateRange, setDateRange] = useState<DateRange>([minDate, maxDate]);
+  const [dateRange, setDateRange] = useState<DateRange>([MIN_DATE, MAX_DATE]);
 
   const [layout, setLayout] = useState<Layout>('compact');
 
-  const [dateRangeParams, setDateRangeParams] = useState<DateRange>([minDate, maxDate]);
+  const [dateRangeParams, setDateRangeParams] = useState<DateRange>([MIN_DATE, MAX_DATE]);
 
   const handleChangeDateRange = (value: DateRange) => {
     setDateRange(value);
@@ -52,8 +58,8 @@ const StockPrices = () => {
 
   const { control, watch } = useForm<FormValues>({
     defaultValues: {
-      selectedTickers: ['AAPL'],
-      ohlc: 'close',
+      selectedTickers: [DEFAULT_TICKER],
+      ohlc: DEFAULT_OHLC,
     },
   });
 
@@ -64,12 +70,12 @@ const StockPrices = () => {
     const nbDays = getDiffDays(startDateParam, endDateParams);
 
     // if the date range is more than 90 days, we set start and end date to min and max date
-    // in order to avoid making too many requests
-    // chart will be plotted based on the user selected date range
-    const startDate = nbDays > 90 ? minDate : startDateParam;
-    const endDate = nbDays > 90 ? maxDate : endDateParams;
+    // in order to avoid sending too many requests
+    // chart will still be plotted based on the user selected date range
+    const startDate = nbDays > MAX_DAYS_FETCH_GRANULAR_DATA ? MIN_DATE : startDateParam;
+    const endDate = nbDays > MAX_DAYS_FETCH_GRANULAR_DATA ? MAX_DATE : endDateParams;
 
-    const timespan = nbDays < 2 ? 'hour' : 'day';
+    const timespan = nbDays <= MAX_DAY_SHOW_HOURS ? 'hour' : 'day';
 
     return {
       tickers: selectedTickers,
@@ -176,7 +182,7 @@ const StockPrices = () => {
                 <Box>
                   <Typography variant="h6">Date Range</Typography>
                 </Box>
-                <Button variant="outlined" onClick={() => setDateRange([minDate, maxDate])}>
+                <Button variant="outlined" onClick={() => setDateRange([MIN_DATE, MAX_DATE])}>
                   Reset
                 </Button>
               </Box>
